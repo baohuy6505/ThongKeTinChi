@@ -20,6 +20,7 @@ import com.example.gk1.viewmodel.MainViewModel
 @Composable
 fun HomeScreen(navController: NavController, viewModel: MainViewModel) {
     Scaffold(
+
         topBar = {
             TopAppBar(
                 title = { Text("Quản lý môn học") },
@@ -31,7 +32,7 @@ fun HomeScreen(navController: NavController, viewModel: MainViewModel) {
                         navController.navigate("invoice/$theory/$practice")
                     }) {
                         Icon(
-                            imageVector = Icons.Default.ShoppingCart,
+                            imageVector = Icons.Default.Payment,
                             contentDescription = "Thanh toán",
                             tint = Color.Red
                         )
@@ -66,16 +67,38 @@ fun HomeScreen(navController: NavController, viewModel: MainViewModel) {
                     onCheckedChange = { viewModel.isPractice = it }
                 )
             }
-            Button(
-                onClick = { viewModel.addSubject() },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Thêm")
+
+            // KIỂM TRA ĐỂ HIỂN THỊ NÚT: Đang thêm mới hay Đang sửa
+            if (viewModel.editingSubjectId != null) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Button(
+                        onClick = { viewModel.resetForm() }, // Nút Hủy
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
+                    ) {
+                        Text("Hủy")
+                    }
+                    Button(
+                        onClick = { viewModel.addSubjectOrUpdate() }, // Nút Cập nhật
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("Cập nhật")
+                    }
+                }
+            } else {
+                Button(
+                    onClick = { viewModel.addSubjectOrUpdate() }, // Nút Thêm
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Thêm")
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Danh sách
             LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 items(viewModel.subjectList) { subject ->
                     Card(modifier = Modifier.fillMaxWidth()) {
@@ -88,11 +111,17 @@ fun HomeScreen(navController: NavController, viewModel: MainViewModel) {
                                 Text(subject.name, style = MaterialTheme.typography.titleMedium)
                                 Text("${subject.credits} tín chỉ - ${if(subject.isPractice) "Thực hành" else "Lý thuyết"}")
                             }
-                            IconButton(onClick = { /* Todo sửa */ }) {
-                                Icon(Icons.Default.Edit, contentDescription = "Sửa")
+
+                            // Nút Sửa: Chỉ cần gọi hàm startEditing, KHÔNG xóa list nữa
+                            IconButton(onClick = {
+                                viewModel.startEditing(subject)
+                            }) {
+                                Icon(Icons.Default.Edit, contentDescription = "Sửa", tint = Color.Blue)
                             }
+
+                            // Nút Xóa: Nếu xóa nhầm item đang sửa thì form tự dọn dẹp nhờ hàm deleteSubject
                             IconButton(onClick = { viewModel.deleteSubject(subject) }) {
-                                Icon(Icons.Default.Delete, contentDescription = "Xóa")
+                                Icon(Icons.Default.Delete, contentDescription = "Xóa", tint = Color.Red)
                             }
                         }
                     }

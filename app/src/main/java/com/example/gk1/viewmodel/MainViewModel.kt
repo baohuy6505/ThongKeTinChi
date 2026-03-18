@@ -12,24 +12,61 @@ class MainViewModel : ViewModel() {
     var subjectCredits by mutableStateOf("")
     var isPractice by mutableStateOf(false)
 
+    var editingSubjectId: String? by mutableStateOf(null)
+
     val subjectList = mutableStateListOf<Subject>()
 
-    fun addSubject() {
+    fun addSubjectOrUpdate() {
         val credits = subjectCredits.toIntOrNull() ?: 0
         if (subjectName.isNotBlank() && credits > 0) {
-            subjectList.add(Subject(name = subjectName, credits = credits, isPractice = isPractice))
-            // Reset form sau khi thêm
-            subjectName = ""
-            subjectCredits = ""
-            isPractice = false
+            if (editingSubjectId == null) {
+                subjectList.add(
+                    Subject(
+                        name = subjectName,
+                        credits = credits,
+                        isPractice = isPractice
+                    )
+                )
+            } else {
+                val index = subjectList.indexOfFirst { it.id == editingSubjectId }
+                if (index != -1) {
+                    val oldSubject = subjectList[index]
+
+                    if (oldSubject.name != subjectName || oldSubject.credits != credits || oldSubject.isPractice != isPractice) {
+                        subjectList[index] = Subject(
+                            id = editingSubjectId!!,
+                            name = subjectName,
+                            credits = credits,
+                            isPractice = isPractice
+                        )
+                    }
+                }
+            }
+            resetForm()
         }
+    }
+
+    fun startEditing(subject: Subject) {
+        editingSubjectId = subject.id
+        subjectName = subject.name
+        subjectCredits = subject.credits.toString()
+        isPractice = subject.isPractice
+    }
+
+    fun resetForm() {
+        editingSubjectId = null
+        subjectName = ""
+        subjectCredits = ""
+        isPractice = false
     }
 
     fun deleteSubject(subject: Subject) {
         subjectList.remove(subject)
+        if (subject.id == editingSubjectId) {
+            resetForm()
+        }
     }
 
-    // Tính tổng tín chỉ để truyền sang màn hình 2
     fun getTotalTheoryCredits(): Int = subjectList.filter { !it.isPractice }.sumOf { it.credits }
     fun getTotalPracticeCredits(): Int = subjectList.filter { it.isPractice }.sumOf { it.credits }
 }
