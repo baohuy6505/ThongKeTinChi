@@ -11,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -25,16 +26,15 @@ fun HomeScreen(navController: NavController, viewModel: MainViewModel) {
             TopAppBar(
                 title = { Text("Quản lý môn học") },
                 actions = {
-                    // X = 3 (LẺ): Nút đỏ trên TopAppBar
                     IconButton(onClick = {
                         val theory = viewModel.getTotalTheoryCredits()
                         val practice = viewModel.getTotalPracticeCredits()
                         navController.navigate("invoice/$theory/$practice")
                     }) {
                         Icon(
-                            imageVector = Icons.Default.Payment,
+                            imageVector = Icons.Default.ShoppingCart,
                             contentDescription = "Thanh toán",
-                            tint = Color.Red
+                            tint = Color.Blue
                         )
                     }
                 }
@@ -45,6 +45,16 @@ fun HomeScreen(navController: NavController, viewModel: MainViewModel) {
             modifier = Modifier.padding(paddingValues).padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+            Text(
+                text = "Họ và tên: Nguyễn Bảo Huy - Lớp: 23CNTT3",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(modifier = Modifier.height(4.dp))
+            HorizontalDivider(color = Color.LightGray)
+            Spacer(modifier = Modifier.height(8.dp))
             // Form Nhập
             OutlinedTextField(
                 value = viewModel.subjectName,
@@ -60,7 +70,7 @@ fun HomeScreen(navController: NavController, viewModel: MainViewModel) {
                 modifier = Modifier.fillMaxWidth()
             )
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(if (viewModel.isPractice) "Loại: Thực hành" else "Loại: Lý thuyết")
+                Text(if (viewModel.isPractice) "Loại: Lý thuyết" else "Loại: Thực hành")
                 Spacer(modifier = Modifier.width(8.dp))
                 Switch(
                     checked = viewModel.isPractice,
@@ -68,7 +78,6 @@ fun HomeScreen(navController: NavController, viewModel: MainViewModel) {
                 )
             }
 
-            // KIỂM TRA ĐỂ HIỂN THỊ NÚT: Đang thêm mới hay Đang sửa
             if (viewModel.editingSubjectId != null) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),

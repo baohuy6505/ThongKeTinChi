@@ -1,5 +1,6 @@
 package com.example.gk1.ui
 
+import CertificateStamp
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -140,22 +141,12 @@ fun InvoiceScreen(navController: NavController, theoryCredits: Int, practiceCred
             val diameterDp = radiusDp * 2
 
             Box(
-                modifier = Modifier.size(diameterDp),
+                modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
-                Canvas(modifier = Modifier.matchParentSize()) {
-                    drawCircle(
-                        color = Color.Blue,
-                        style = Stroke(width = 5f)
-                    )
-                }
-                Text(
-                    text = X.toString(),
-                    color = Color.Blue,
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold
-                )
+                CertificateStamp()
             }
         }
     }
 }
+
